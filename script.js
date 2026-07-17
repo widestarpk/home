@@ -1,4 +1,4 @@
-<script>
+
     // =====================================
     // CONFIGURATION
     // 
@@ -1928,4 +1928,4 @@ document.querySelector('.services-carousel-container')?.addEventListener
 cursorFollower.style.display = 'none';
       }
     });
-  </script>
+
