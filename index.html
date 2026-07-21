@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+<script>(function(){try{var t=localStorage.getItem('theme');if(!t){t='dark';localStorage.setItem('theme','dark');}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -3054,9 +3055,278 @@
       .budget-card { aspect-ratio: 5/4; }
       .budget-result .range { font-size: 1.25rem; }
     }
+
+/* ============ (a) STAR GLITTER PRELOADER ============ */
+#preloader {
+  position: fixed; inset: 0;
+  background: #0a0a0a;
+  z-index: 999999;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .6s ease, visibility .6s ease;
+}
+#preloader.done { opacity: 0; visibility: hidden; }
+body.preloading { overflow: hidden; }
+body.preloading .hero-bg.active { opacity: 0 !important; }
+.preloader-stage {
+  position: relative;
+  width: 260px; height: 260px;
+  display: flex; align-items: center; justify-content: center;
+}
+.preloader-stage svg { width: 100%; height: 100%; overflow: visible; }
+.preloader-stage .star-outline {
+  fill: none;
+  stroke: rgba(255,255,255,0.06);
+  stroke-width: 1.2;
+}
+.preloader-stage .star-trail {
+  fill: none;
+  stroke: #F1824A;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px rgba(241,130,74,.85)) drop-shadow(0 0 14px rgba(241,130,74,.5));
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 1200;
+  animation: starTrace 2.6s linear forwards;
+}
+@keyframes starTrace {
+  0%   { stroke-dashoffset: 1200; opacity: 1; }
+  100% { stroke-dashoffset: 0;    opacity: 1; }
+}
+.preloader-stage .star-trail.fade-out {
+  animation: trailFade .35s ease forwards;
+}
+@keyframes trailFade { to { opacity: 0; } }
+.preloader-star-logo {
+  position: absolute;
+  inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transform: scale(.2);
+  pointer-events: none;
+}
+.preloader-star-logo.pop {
+  animation: starPop .7s cubic-bezier(.22,1.4,.36,1) forwards;
+}
+.preloader-star-logo img {
+  width: 72%; height: 72%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 24px rgba(241,130,74,.65)) drop-shadow(0 0 60px rgba(241,130,74,.35));
+}
+@keyframes starPop {
+  0%   { opacity: 0; transform: scale(.2) rotate(-25deg); }
+  55%  { opacity: 1; transform: scale(1.18) rotate(6deg); }
+  80%  { transform: scale(.94) rotate(-2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+.preloader-glitter {
+  position: absolute;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 0 10px 2px currentColor;
+}
+@keyframes glitterFall {
+  0%   { opacity: 1; transform: translate(0,0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.2); }
+}
+.preloader-brand {
+  position: absolute; bottom: 10%; left: 0; right: 0;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  color: rgba(255,255,255,.85);
+  letter-spacing: .3em;
+  font-size: .85rem;
+  opacity: 0;
+  animation: brandFade 1s ease 2.7s forwards;
+}
+@keyframes brandFade { to { opacity: 1; } }
+
+/* ============ (e) FEATURED VENUE THUMB — smaller on desktop ============ */
+@media (min-width: 1025px) {
+  .venue-thumbs {
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.7rem;
+    max-width: 900px;
+    margin-left: auto; margin-right: auto;
+  }
+  .venue-thumb { border-radius: 12px; }
+  .venue-thumb.active {
+    border-radius: 50%;
+  }
+}
+
+/* ============ (f) FEATURED VENUE — description clamp + Read More ============ */
+.venue-featured-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: .5rem;
+}
+.venue-featured-desc.expanded {
+  -webkit-line-clamp: unset;
+  display: block;
+  overflow: visible;
+}
+.venue-read-more {
+  background: none; border: none; color: var(--accent);
+  font-weight: 600; cursor: pointer; padding: 0 0 .75rem;
+  font-size: .88rem; letter-spacing: .02em;
+  display: inline-block;
+}
+.venue-read-more:hover { text-decoration: underline; }
+
+/* (f) Larger featured nav buttons on desktop */
+@media (min-width: 769px) {
+  .venue-featured-nav button {
+    width: 58px; height: 58px; font-size: 1.15rem;
+  }
+}
+
+/* (f) On mobile: move featured nav to bottom-right in front of Plan Your Budget */
+@media (max-width: 768px) {
+  .venue-featured-nav {
+    top: auto; bottom: 1rem; right: 1rem;
+    transform: none;
+    gap: .5rem;
+  }
+  .venue-featured-nav button {
+    width: 40px; height: 40px; font-size: .85rem;
+  }
+  .venue-featured-content {
+    padding-bottom: 4.5rem;
+  }
+  .venue-featured-actions {
+    padding-right: 100px; /* leave room for nav buttons */
+  }
+}
+
+/* ============ (c) SERVICES CAROUSEL — mobile ============ */
+@media (max-width: 768px) {
+  .services-carousel-container {
+    padding: 1rem 0 0;
+    overflow: visible;
+  }
+  .carouselStage {
+    height: 420px;
+    overflow: visible;
+    touch-action: pan-y;
+  }
+  .service-card {
+    transition: transform .45s cubic-bezier(.22,.9,.3,1.1),
+                filter .35s ease,
+                box-shadow .35s ease,
+                opacity .35s ease;
+  }
+  .services-carousel-wrapper {
+    position: absolute;
+    top: 46%;
+    left: 0; right: 0;
+    transform: translateY(-50%);
+    justify-content: space-between;
+    pointer-events: none;
+    padding: 0 8px;
+    margin-top: 0;
+    z-index: 10;
+  }
+  .services-carousel-wrapper .services-nav-btn {
+    pointer-events: auto;
+    width: 46px; height: 46px;
+    border: 2px solid var(--accent);
+    background: rgba(0,0,0,.45);
+    color: #fff;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 8px 22px rgba(0,0,0,.35);
+  }
+  .services-carousel-wrapper .services-nav-btn:hover {
+    background: var(--gradient-accent);
+  }
+  .services-dots { margin-top: 1.25rem; }
+}
+
+/* Services nav buttons — match venue-featured-nav look everywhere */
+.services-nav-btn {
+  border: 2px solid var(--accent) !important;
+  background: rgba(0,0,0,.35) !important;
+  color: #fff !important;
+  backdrop-filter: blur(6px);
+}
+.services-nav-btn:hover {
+  background: var(--gradient-accent) !important;
+  transform: scale(1.08);
+  box-shadow: 0 8px 22px rgba(241,130,74,.45);
+}
+
+/* ============ (h) Mobile nav Book Now / Become a Vendor overlap ============ */
+.mobile-nav-links li a.cta-button,
+.mobile-nav-links li a.btn-secondary {
+  display: inline-block;
+  padding: .7rem 1.5rem;
+  margin-top: .35rem;
+  line-height: 1.2;
+  border-radius: 50px;
+}
+.mobile-nav-links li a.btn-secondary {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--accent);
+}
+.mobile-nav-links li:has(a.cta-button),
+.mobile-nav-links li:has(a.btn-secondary) {
+  margin-bottom: 1rem;
+}
+
+/* ============ (g) Budget category — no re-animate on select ============ */
+.budget-card.no-anim,
+.budget-card.no-anim * { animation: none !important; }
+
+/* (g) spinner above text (structural fix in HTML too) */
+.budget-step.crunching { text-align: center; }
+.budget-step.crunching .budget-spinner { margin: 0 auto 1rem; }
+
+/* (c) No focus outline on the services carousel — keyboard nav is bound at document level */
+#servicesCarousel, #servicesCarousel:focus, #servicesCarousel *:focus,
+.services-carousel-container, .services-carousel-container:focus,
+.services-carousel-wrapper, .services-carousel-wrapper:focus { outline: none !important; box-shadow: none !important; }
+
+/* (d) Smaller featured venue description on mobile */
+@media (max-width: 768px) {
+  .venue-featured-desc { font-size: 0.82rem; line-height: 1.45; }
+}
+
 </style>
 </head>
-<body>
+<body class="preloading">
+  <!-- (a) Star Glitter Preloader -->
+  <div id="preloader" aria-hidden="true">
+    <div class="preloader-stage">
+      <svg viewBox="-10 -10 220 220" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="glitterGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%"  stop-color="#f1824a"/>
+            <stop offset="50%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#000000"/>
+          </linearGradient>
+          <filter id="glitterGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3.5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <polygon class="star-outline"
+          points="100,4 123,74 197,74 137,117 160,187 100,144 40,187 63,117 3,74 77,74"/>
+        <polygon class="star-trail"
+          points="100,4 123,74 197,74 137,117 160,187 100,144 40,187 63,117 3,74 77,74"/>
+      </svg>
+      <div class="preloader-star-logo" id="preloaderStarLogo">
+        <!-- Replace src below with your star logo URL -->
+        <img src="https://raw.githubusercontent.com/widestarpk/home/refs/heads/main/logo_white.png" alt="WideStar" onerror="this.style.background='transparent'">
+      </div>
+    </div>
+    <div class="preloader-brand">WIDESTAR</div>
+  </div>
+
   <!-- Dark Mode Toggle -->
   <button class="dark-mode-toggle" id="darkModeToggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
     <i class="fas fa-sun" id="darkModeIcon"></i>
@@ -3759,7 +4029,14 @@
     const typewriterElement = document.getElementById('typewriter');
     const heroBgs = document.querySelectorAll('.hero-bg');
 
+    let __typewriterStarted = false;
+    function startTypewriter() {
+      if (__typewriterStarted) return;
+      __typewriterStarted = true;
+      typeWriter();
+    }
     function typeWriter() {
+      if (!__typewriterStarted) return;
       const currentWord = eventTypes[typewriterIndex];
       
       if (isDeleting) {
@@ -3978,6 +4255,7 @@
     // Touch/swipe support for services
     function initServicesSwipe() {
       const stage = document.getElementById('servicesCarousel');
+      if (!stage) return;
       let sx = 0;
       stage.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; }, { passive: true });
       stage.addEventListener('touchend', (e) => {
@@ -3985,11 +4263,26 @@
         if (Math.abs(dx) > 40) moveServicesCarousel(dx > 0 ? -1 : 1);
       });
 
-      // Keyboard
-      stage.setAttribute('tabindex', '0');
-      stage.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft') moveServicesCarousel(-1);
-        if (e.key === 'ArrowRight') moveServicesCarousel(1);
+      // (c) Keyboard arrows are wired to document, activated only while the Services section is in view.
+      // No focus/tabindex/outline required on the carousel itself.
+      stage.removeAttribute('tabindex');
+      stage.style.outline = 'none';
+
+      let servicesInView = false;
+      const section = document.getElementById('services') || stage.closest('section');
+      if (section && 'IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach(en => { servicesInView = en.isIntersecting && en.intersectionRatio > 0.2; });
+        }, { threshold: [0, 0.2, 0.5] });
+        io.observe(section);
+      }
+      document.addEventListener('keydown', (e) => {
+        if (!servicesInView) return;
+        // ignore if user is typing in a field
+        const t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+        if (e.key === 'ArrowLeft')  { moveServicesCarousel(-1); }
+        if (e.key === 'ArrowRight') { moveServicesCarousel(1);  }
       });
     }
 
@@ -4053,9 +4346,26 @@
       );
     }
     function maybeShowLocationModal() {
+      // (b) Location modal now triggered via IntersectionObserver on the venues section
       if (userCoords) return;
       if (sessionStorage.getItem('ws_loc_prompted') === '1') return;
-      setTimeout(openLocationModal, 1200);
+      const venuesSection = document.getElementById('venues');
+      if (!venuesSection) return;
+      let shown = false;
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting && !shown) {
+            shown = true;
+            io.disconnect();
+            setTimeout(() => {
+              if (!userCoords && sessionStorage.getItem('ws_loc_prompted') !== '1') {
+                openLocationModal();
+              }
+            }, 2000);
+          }
+        });
+      }, { threshold: 0.25 });
+      io.observe(venuesSection);
     }
 
     // =====================================
@@ -4203,10 +4513,10 @@
       } else if (s.step === 3.5) {
         budgetProgress(95);
         html = `
-          <div class="budget-step" style="text-align:center;">
+          <div class="budget-step crunching">
+            <div class="budget-spinner"></div>
             <h3>Crunching the numbers…</h3>
             <p class="budget-sub">Preparing your personalised estimate.</p>
-            <div class="budget-spinner"></div>
           </div>`;
       } else if (s.step === 4) {
         budgetProgress(100);
@@ -4242,7 +4552,16 @@
     }
     function selectBudgetCategory(t) {
       budgetState.category = t;
-      renderBudgetStep();
+      // (g) Just toggle selection without re-rendering to avoid re-triggering the fade/rise animation
+      document.querySelectorAll('#budgetStepContainer .budget-card').forEach(card => {
+        card.classList.add('no-anim');
+        card.classList.remove('selected');
+      });
+      const cards = document.querySelectorAll('#budgetStepContainer .budget-card');
+      cards.forEach(card => {
+        const label = card.querySelector('.budget-card-label');
+        if (label && label.textContent.trim() === t) card.classList.add('selected');
+      });
     }
     function budgetBack() {
       const s = budgetState;
@@ -4353,6 +4672,13 @@
       const gallery = v.gallery || [v.image];
       const galleryAttr = JSON.stringify(gallery).replace(/"/g, '&quot;');
       const desc = v.description || '';
+      // (f) Truncate long descriptions with a Read More toggle
+      const DESC_LIMIT = 140;
+      const isLong = desc.length > DESC_LIMIT;
+      const shortDesc = isLong ? desc.slice(0, DESC_LIMIT).replace(/\s+\S*$/, '') + '…' : desc;
+      const readMoreHtml = isLong
+        ? `<button type="button" class="venue-read-more" onclick="toggleVenueDesc(this)" data-full="${encodeURIComponent(desc)}" data-short="${encodeURIComponent(shortDesc)}">Read More</button>`
+        : '';
       const minutes = computeMinutesFromUser(v);
       const distanceHtml = (minutes !== null)
         ? `<span class="venue-distance"><i class="fas fa-map-marker-alt"></i> ${minutes} minutes from you.</span>`
@@ -4371,7 +4697,8 @@
         </div>
         <div class="venue-featured-content">
           <h3 class="venue-featured-name">${v.name}</h3>
-          <p class="venue-featured-desc">${desc}</p>
+          <p class="venue-featured-desc">${isLong ? shortDesc : desc}</p>
+          ${readMoreHtml}
           <div class="venue-featured-actions">
             <a href="#booking" class="venue-btn primary">Book Now</a>
             <button class="venue-btn ghost" onclick="openGalleryModal(${galleryAttr})">View Gallery</button>
@@ -4404,6 +4731,40 @@
       });
     }
 
+    // (f/d) Toggle full/short description. Grow the wrapper synchronously by the
+    // exact height added to the description so the venue name stays visually
+    // anchored in place — only the Read More button and action buttons move down.
+    function toggleVenueDesc(btn) {
+      const wrap = btn.closest('.venue-featured');
+      const p = wrap && wrap.querySelector('.venue-featured-desc');
+      if (!p) return;
+      const wrapper = document.querySelector('.venue-featured-wrapper');
+      const content = wrap.querySelector('.venue-featured-content');
+      if (!wrapper || !content) return;
+
+      // Measure the whole content block BEFORE toggling.
+      const beforeContentH = content.getBoundingClientRect().height;
+      const beforeWrapperH = wrapper.getBoundingClientRect().height;
+
+      const expanded = p.classList.toggle('expanded');
+      p.textContent = expanded
+        ? decodeURIComponent(btn.dataset.full)
+        : decodeURIComponent(btn.dataset.short);
+      btn.textContent = expanded ? 'Read Less' : 'Read More';
+
+      // Force synchronous layout so we read the NEW content height in the
+      // same JS turn — this guarantees the wrapper grows in the exact same
+      // paint as the description expansion, so the venue name never jumps up.
+      const afterContentH = content.getBoundingClientRect().height;
+      const delta = afterContentH - beforeContentH;
+
+      if (expanded) {
+        wrapper.style.minHeight = Math.ceil(beforeWrapperH + delta) + 'px';
+      } else {
+        wrapper.style.minHeight = '';
+      }
+    }
+
     function selectVenue(i) {
       if (venueTransitioning || i === venueCurrentIndex) return;
       venueTransitioning = true;
@@ -4413,9 +4774,23 @@
       setTimeout(() => { venueTransitioning = false; }, 550);
     }
 
-    function moveVenueCarousel(direction) {
+    // (d) Auto-slideshow controls
+    function startVenueAutoRotate() {
+      clearInterval(venueAutoRotate);
+      venueAutoRotate = setInterval(() => moveVenueCarousel(1, /*manual*/ false), 5000);
+    }
+    function stopVenueAutoRotate() { clearInterval(venueAutoRotate); }
+    function pauseVenueAutoFor(ms) {
+      stopVenueAutoRotate();
+      clearTimeout(window.__venuePauseT);
+      window.__venuePauseT = setTimeout(startVenueAutoRotate, ms);
+    }
+
+    function moveVenueCarousel(direction, manual) {
       const n = venuesData.length; if (!n) return;
       selectVenue((venueCurrentIndex + direction + n) % n);
+      // (d) Manual navigation pauses auto-slideshow for 10 seconds
+      if (manual !== false) pauseVenueAutoFor(10000);
     }
 
 
@@ -4789,7 +5164,8 @@
     // =====================================
     document.addEventListener('DOMContentLoaded', () => {
       loadTheme();
-      typeWriter();
+      // Typewriter and hero bg cycle start after preloader completes
+      // typeWriter() intentionally not called here
       createParticles();
       animateCursor();
       setupScrollReveal();
@@ -4806,16 +5182,28 @@
       initServicesSwipe();
       startServicesAutoRotate();
 
-      // Start venue auto-rotate
-      venueAutoRotate = setInterval(() => moveVenueCarousel(1), 5000);
+      // (d) Start venue auto-rotate
+      startVenueAutoRotate();
 
-      document.querySelector('.venue-carousel-wrapper')?.addEventListener('mouseenter', () => {
-        clearInterval(venueAutoRotate);
-      });
+      const venueWrapper = document.querySelector('.venue-featured-wrapper');
+      if (venueWrapper) {
+        // Pause on any hover over the featured card OR any of its action buttons
+        venueWrapper.addEventListener('mouseenter', stopVenueAutoRotate);
+        venueWrapper.addEventListener('mouseleave', startVenueAutoRotate);
 
-      document.querySelector('.venue-carousel-wrapper')?.addEventListener('mouseleave', () => {
-        venueAutoRotate = setInterval(() => moveVenueCarousel(1), 5000);
-      });
+        // Explicitly pause when hovering/clicking action buttons or nav arrows inside the card.
+        // Delegated so it applies after each re-render.
+        venueWrapper.addEventListener('mouseover', (e) => {
+          if (e.target.closest('.venue-btn, .venue-featured-nav button, .venue-read-more')) {
+            stopVenueAutoRotate();
+          }
+        });
+        venueWrapper.addEventListener('click', (e) => {
+          if (e.target.closest('.venue-btn, .venue-read-more')) {
+            pauseVenueAutoFor(10000);
+          }
+        });
+      }
 
       // Services carousel hover
       document.querySelector('.services-carousel-container')?.addEventListener('mouseenter', stopServicesAutoRotate);
@@ -4827,6 +5215,103 @@
         cursorFollower.style.display = 'none';
       }
     });
+
+
+    // ============ (a) PRELOADER RUNTIME ============
+    (function initPreloader(){
+      const pre = document.getElementById('preloader');
+      if (!pre) return;
+      const stage = pre.querySelector('.preloader-stage');
+      const trail = pre.querySelector('.star-trail');
+      const logo  = document.getElementById('preloaderStarLogo');
+
+      // (fix a) Restart the CSS trail animation from JS so its start time is
+      // synchronized with the JS RAF loop below. Without this, the CSS
+      // animation begins the moment the SVG parses (which can be well before
+      // this script executes on slow loads), leaving the glitter head + logo
+      // pop out of sync — sometimes appearing, sometimes not.
+      if (trail) {
+        trail.style.animation = 'none';
+        // Force reflow so the browser registers the reset.
+        void trail.getBoundingClientRect();
+        trail.style.animation = 'starTrace 2.6s linear forwards';
+      }
+
+      // Build path around the star polygon (points in 0..100 space, matching SVG viewBox 0..200 scaled)
+      const colors = ['#f1824a', '#ffffff', '#000000'];
+      const pts = [
+        [50,2],[61.5,37],[98.5,37],[68.5,58.5],[80,93.5],
+        [50,72],[20,93.5],[31.5,58.5],[1.5,37],[38.5,37]
+      ];
+      let path = [];
+      for (let i=0;i<pts.length;i++){
+        const a=pts[i], b=pts[(i+1)%pts.length];
+        for (let t=0;t<1;t+=0.04){
+          path.push([a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t]);
+        }
+      }
+
+      // Glitter follows the star border at EXACTLY the same speed as the trail animation (2.6s, linear).
+      const DURATION = 2600;
+      const start = performance.now();
+      let rafId;
+      let popped = false;
+      function popLogo(){
+        if (popped) return;
+        popped = true;
+        if (trail) trail.classList.add('fade-out');
+        if (logo)  logo.classList.add('pop');
+      }
+      function step(now){
+        const elapsed = now - start;
+        const progress = Math.min(1, elapsed / DURATION);
+        // Head of the trail's current position on the polygon perimeter
+        const idx = Math.floor(progress * (path.length - 1));
+        const p = path[idx];
+        // Spawn 2 glitter particles at the leading edge each frame
+        for (let k=0;k<2;k++){
+          const g = document.createElement('div');
+          g.className = 'preloader-glitter';
+          g.style.left = 'calc(' + p[0] + '% - 3px)';
+          g.style.top  = 'calc(' + p[1] + '% - 3px)';
+          const c = colors[Math.floor(Math.random()*colors.length)];
+          g.style.color = c; g.style.background = c;
+          const angle = Math.random() * Math.PI * 2;
+          const dist = 20 + Math.random() * 40;
+          g.style.setProperty('--dx', Math.cos(angle)*dist+'px');
+          g.style.setProperty('--dy', Math.sin(angle)*dist+'px');
+          g.style.animation = 'glitterFall ' + (600 + Math.random()*400) + 'ms ease-out forwards';
+          stage.appendChild(g);
+          setTimeout(() => g.remove(), 1100);
+        }
+        if (progress < 1) {
+          rafId = requestAnimationFrame(step);
+        } else {
+          // Border complete → fade trail, pop the logo in immediately
+          popLogo();
+        }
+      }
+      rafId = requestAnimationFrame(step);
+
+      // (fix a) Wall-clock fallback: guarantees the trail fade + logo pop
+      // fire even if RAF is throttled (e.g. background tab) or if the img
+      // took extra time to decode. Uses setTimeout which is not throttled
+      // as aggressively as RAF for this short a duration.
+      setTimeout(popLogo, DURATION + 30);
+
+      function finishPreloader(){
+        pre.classList.add('done');
+        document.body.classList.remove('preloading');
+        try { startTypewriter(); } catch(e) {}
+        setTimeout(() => { pre.remove(); }, 700);
+      }
+
+      // (b) Show website exactly 1s after the animation completes, regardless of backend load state.
+      // Animation = 2.6s trace + 0.7s pop = 3.3s. Add 1s reveal delay -> 4.3s total.
+      const REVEAL_AFTER = 2600 + 700 + 1000;
+      setTimeout(finishPreloader, REVEAL_AFTER);
+    })();
+
   </script>
 </body>
 </html>
