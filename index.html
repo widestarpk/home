@@ -1448,9 +1448,15 @@
     .venue-featured {
       position: relative;
       width: 100%;
-      height: 100%;
       min-height: 460px;
+      padding-top: 240px;
+      display: flex;
+      flex-direction: column;
     }
+
+    @media (max-width: 768px) {
+  .venue-featured { padding-top: 180px; }
+}
 
     .venue-featured-bg {
       position: absolute;
@@ -1541,10 +1547,8 @@
     }
 
     .venue-featured-content {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      position: relative;
+      margin-top: 0;
       padding: 1.5rem 1.75rem 1.75rem;
       z-index: 3;
       color: #fff;
@@ -3077,7 +3081,10 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
   fill: none;
   stroke: rgba(255,255,255,0.06);
   stroke-width: 1.2;
+  opacity: 1;
+  transition: opacity .35s ease;
 }
+.preloader-stage .star-outline.fade-out { opacity: 0; }
 .preloader-stage .star-trail {
   fill: none;
   stroke: #F1824A;
@@ -3087,16 +3094,16 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
   filter: drop-shadow(0 0 6px rgba(241,130,74,.85)) drop-shadow(0 0 14px rgba(241,130,74,.5));
   stroke-dasharray: 1200;
   stroke-dashoffset: 1200;
-  animation: starTrace 2.6s linear forwards;
+  opacity: 1;
+  transition: opacity .35s ease, stroke-dashoffset 1800ms linear;
 }
-@keyframes starTrace {
-  0%   { stroke-dashoffset: 1200; opacity: 1; }
-  100% { stroke-dashoffset: 0;    opacity: 1; }
+.preloader-stage .star-trail.no-anim {
+  transition: none !important;
 }
-.preloader-stage .star-trail.fade-out {
-  animation: trailFade .35s ease forwards;
+.preloader-stage .star-trail.tracing {
+  stroke-dashoffset: 0;
 }
-@keyframes trailFade { to { opacity: 0; } }
+.preloader-stage .star-trail.fade-out { opacity: 0; }
 .preloader-star-logo {
   position: absolute;
   inset: 0;
@@ -3104,28 +3111,33 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
   opacity: 0;
   transform: scale(.2);
   pointer-events: none;
+  transition: opacity .35s ease;
 }
 .preloader-star-logo.pop {
   animation: starPop .7s cubic-bezier(.22,1.4,.36,1) forwards;
 }
+.preloader-star-logo.fade-out {
+  opacity: 0 !important;
+  transition: opacity .35s ease;
+}
 .preloader-star-logo img {
-  width: 72%; height: 72%;
+  width: 100%; height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 0 24px rgba(241,130,74,.65)) drop-shadow(0 0 60px rgba(241,130,74,.35));
 }
 @keyframes starPop {
-  0%   { opacity: 0; transform: scale(.2) rotate(-25deg); }
-  55%  { opacity: 1; transform: scale(1.18) rotate(6deg); }
-  80%  { transform: scale(.94) rotate(-2deg); }
-  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  0%   { opacity: 0; transform: scale(.3); }
+  60%  { opacity: 1; transform: scale(1.12); }
+  100% { opacity: 1; transform: scale(1); }
 }
+
 .preloader-glitter {
   position: absolute;
-  width: 6px; height: 6px;
+  width: 4px; height: 4px;
   border-radius: 50%;
   pointer-events: none;
   opacity: 0;
-  box-shadow: 0 0 10px 2px currentColor;
+  box-shadow: 0 0 5px 1px currentColor;
 }
 @keyframes glitterFall {
   0%   { opacity: 1; transform: translate(0,0) scale(1); }
@@ -3159,24 +3171,45 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
 
 /* ============ (f) FEATURED VENUE — description clamp + Read More ============ */
 .venue-featured-desc {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  margin-bottom: .5rem;
+  margin-bottom: .75rem;
 }
-.venue-featured-desc.expanded {
-  -webkit-line-clamp: unset;
-  display: block;
-  overflow: visible;
+/* Dynamically-injected expanded description container.
+   Has its OWN bounded scroll area so the wrapper never has to grow
+   indefinitely and content never clips against the wrapper's overflow:hidden. */
+.venue-featured-desc-full {
+  color: rgba(255,255,255,.92);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  margin-bottom: 0.6rem;
+  max-width: 700px;
+  animation: venueDescReveal .35s ease both;
 }
+.venue-featured-desc-full::-webkit-scrollbar { width: 6px; }
+.venue-featured-desc-full::-webkit-scrollbar-track {
+  background: rgba(255,255,255,.10); border-radius: 6px;
+}
+.venue-featured-desc-full::-webkit-scrollbar-thumb {
+  background: var(--accent); border-radius: 6px;
+}
+.venue-featured-desc-full::-webkit-scrollbar-thumb:hover { background: #ff9a63; }
+@keyframes venueDescReveal {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* Hide the clamped <p> while the expanded div is showing */
+.venue-featured-desc.is-hidden { display: none !important; }
+
 .venue-read-more {
   background: none; border: none; color: var(--accent);
-  font-weight: 600; cursor: pointer; padding: 0 0 .75rem;
+  font-weight: 600; cursor: pointer; padding: 0;
   font-size: .88rem; letter-spacing: .02em;
-  display: inline-block;
+  display: inline;
+  margin-left: .25rem;
 }
 .venue-read-more:hover { text-decoration: underline; }
+
+/* Allow the wrapper to grow smoothly instead of snapping */
+.venue-featured-wrapper { transition: min-height .35s ease; }
 
 /* (f) Larger featured nav buttons on desktop */
 @media (min-width: 769px) {
@@ -3316,7 +3349,7 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
         </defs>
         <polygon class="star-outline"
           points="100,4 123,74 197,74 137,117 160,187 100,144 40,187 63,117 3,74 77,74"/>
-        <polygon class="star-trail"
+        <polygon class="star-trail" pathLength="1200"
           points="100,4 123,74 197,74 137,117 160,187 100,144 40,187 63,117 3,74 77,74"/>
       </svg>
       <div class="preloader-star-logo" id="preloaderStarLogo">
@@ -3478,10 +3511,10 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
     <div class="hero-backgrounds" id="heroBackgrounds">
       <div class="hero-bg active" style="background-image: url('https://raw.githubusercontent.com/widestarpk/home/refs/heads/main/hero_wedding.png')"></div>
       <div class="hero-bg" style="background-image: url('https://raw.githubusercontent.com/widestarpk/home/refs/heads/main/hero_birthday.png')"></div>
-      <div class="hero-bg" style="background-image: url('https://widestar.pk/wp-content/uploads/2025/12/Engagement.png')"></div>
-      <div class="hero-bg" style="background-image: url('https://widestar.pk/wp-content/uploads/2025/12/corporate.jpg')"></div>
-      <div class="hero-bg" style="background-image: url('https://widestar.pk/wp-content/uploads/2026/01/nk.png')"></div>
-      <div class="hero-bg" style="background-image: url('https://widestar.pk/wp-content/uploads/2025/12/wedding-album.jpg')"></div>
+      <div class="hero-bg" style="background-image: url('https://raw.githubusercontent.com/widestarpk/home/refs/heads/main/hero_engagement.png')"></div>
+      <div class="hero-bg" style="background-image: url('https://raw.githubusercontent.com/widestarpk/home/refs/heads/main/hero_corporate.png')"></div>
+      <div class="hero-bg" style="background-image: url('https://raw.githubusercontent.com/widestarpk/home/refs/heads/main/hero_nikkah.png')"></div>
+      <div class="hero-bg" style="background-image: url('https://raw.githubusercontent.com/widestarpk/home/refs/heads/main/hero_anniversary.png')"></div>
     </div>
     <div class="hero-particles" id="heroParticles"></div>
     <div class="hero-content">
@@ -4676,9 +4709,10 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
       const DESC_LIMIT = 140;
       const isLong = desc.length > DESC_LIMIT;
       const shortDesc = isLong ? desc.slice(0, DESC_LIMIT).replace(/\s+\S*$/, '') + '…' : desc;
-      const readMoreHtml = isLong
+      const readMoreBtn = isLong
         ? `<button type="button" class="venue-read-more" onclick="toggleVenueDesc(this)" data-full="${encodeURIComponent(desc)}" data-short="${encodeURIComponent(shortDesc)}">Read More</button>`
         : '';
+      const descInner = isLong ? `${shortDesc}${readMoreBtn}` : desc;
       const minutes = computeMinutesFromUser(v);
       const distanceHtml = (minutes !== null)
         ? `<span class="venue-distance"><i class="fas fa-map-marker-alt"></i> ${minutes} minutes from you.</span>`
@@ -4697,8 +4731,7 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
         </div>
         <div class="venue-featured-content">
           <h3 class="venue-featured-name">${v.name}</h3>
-          <p class="venue-featured-desc">${isLong ? shortDesc : desc}</p>
-          ${readMoreHtml}
+          <p class="venue-featured-desc">${descInner}</p>
           <div class="venue-featured-actions">
             <a href="#booking" class="venue-btn primary">Book Now</a>
             <button class="venue-btn ghost" onclick="openGalleryModal(${galleryAttr})">View Gallery</button>
@@ -4731,38 +4764,22 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
       });
     }
 
-    // (f/d) Toggle full/short description. Grow the wrapper synchronously by the
-    // exact height added to the description so the venue name stays visually
-    // anchored in place — only the Read More button and action buttons move down.
+    // (f/d) Read More: dynamically inject the full description into a NEW
+    // inner div with its own bounded scroll area. This keeps the venue name
+    // anchored, avoids the -webkit-line-clamp -> overflow:visible glitch, and
+    // guarantees long descriptions can't clip against the wrapper.
     function toggleVenueDesc(btn) {
-      const wrap = btn.closest('.venue-featured');
-      const p = wrap && wrap.querySelector('.venue-featured-desc');
+      const p = btn.parentNode;
       if (!p) return;
-      const wrapper = document.querySelector('.venue-featured-wrapper');
-      const content = wrap.querySelector('.venue-featured-content');
-      if (!wrapper || !content) return;
-
-      // Measure the whole content block BEFORE toggling.
-      const beforeContentH = content.getBoundingClientRect().height;
-      const beforeWrapperH = wrapper.getBoundingClientRect().height;
-
-      const expanded = p.classList.toggle('expanded');
-      p.textContent = expanded
-        ? decodeURIComponent(btn.dataset.full)
-        : decodeURIComponent(btn.dataset.short);
-      btn.textContent = expanded ? 'Read Less' : 'Read More';
-
-      // Force synchronous layout so we read the NEW content height in the
-      // same JS turn — this guarantees the wrapper grows in the exact same
-      // paint as the description expansion, so the venue name never jumps up.
-      const afterContentH = content.getBoundingClientRect().height;
-      const delta = afterContentH - beforeContentH;
-
-      if (expanded) {
-        wrapper.style.minHeight = Math.ceil(beforeWrapperH + delta) + 'px';
-      } else {
-        wrapper.style.minHeight = '';
-      }
+      const expanded = btn.dataset.expanded === '1';
+      const full  = decodeURIComponent(btn.dataset.full  || '');
+      const short = decodeURIComponent(btn.dataset.short || '');
+      const text  = expanded ? short : full;
+      // Rebuild the paragraph so the button sits inline right after the text.
+      p.textContent = text + ' ';
+      btn.textContent = expanded ? 'Read More' : 'Read Less';
+      btn.dataset.expanded = expanded ? '0' : '1';
+      p.appendChild(btn);
     }
 
     function selectVenue(i) {
@@ -5217,101 +5234,176 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
     });
 
 
-    // ============ (a) PRELOADER RUNTIME ============
+    // ============ (a) PRELOADER RUNTIME — looped like reference video ============
     (function initPreloader(){
       const pre = document.getElementById('preloader');
       if (!pre) return;
       const stage = pre.querySelector('.preloader-stage');
       const trail = pre.querySelector('.star-trail');
+      const outline = pre.querySelector('.star-outline');
       const logo  = document.getElementById('preloaderStarLogo');
+      const logoImg = logo ? logo.querySelector('img') : null;
 
-      // (fix a) Restart the CSS trail animation from JS so its start time is
-      // synchronized with the JS RAF loop below. Without this, the CSS
-      // animation begins the moment the SVG parses (which can be well before
-      // this script executes on slow loads), leaving the glitter head + logo
-      // pop out of sync — sometimes appearing, sometimes not.
-      if (trail) {
-        trail.style.animation = 'none';
-        // Force reflow so the browser registers the reset.
-        void trail.getBoundingClientRect();
-        trail.style.animation = 'starTrace 2.6s linear forwards';
+      // Preload the logo image INDEPENDENTLY so the pop never fires against a blank <img>.
+      let logoReady = false;
+      if (logoImg){
+        if (logoImg.complete && logoImg.naturalWidth > 0){
+          logoReady = true;
+        } else {
+          logoImg.addEventListener('load',  () => { logoReady = true; }, { once: true });
+          logoImg.addEventListener('error', () => { logoReady = true; }, { once: true });
+        }
+      } else {
+        logoReady = true;
       }
 
-      // Build path around the star polygon (points in 0..100 space, matching SVG viewBox 0..200 scaled)
-      const colors = ['#f1824a', '#ffffff', '#000000'];
+      // Build path around the star polygon (points in 0..100 space) for glitter positions
+      const colors = ['#f1824a', '#ffffff', '#ffd7b8'];
       const pts = [
         [50,2],[61.5,37],[98.5,37],[68.5,58.5],[80,93.5],
         [50,72],[20,93.5],[31.5,58.5],[1.5,37],[38.5,37]
       ];
-      let path = [];
+      const path = [];
       for (let i=0;i<pts.length;i++){
         const a=pts[i], b=pts[(i+1)%pts.length];
-        for (let t=0;t<1;t+=0.04){
+        // sample density controls glitter amount
+        for (let t=0;t<1;t+=0.12){
           path.push([a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t]);
         }
       }
 
-      // Glitter follows the star border at EXACTLY the same speed as the trail animation (2.6s, linear).
-      const DURATION = 2600;
-      const start = performance.now();
-      let rafId;
-      let popped = false;
-      function popLogo(){
-        if (popped) return;
-        popped = true;
-        if (trail) trail.classList.add('fade-out');
-        if (logo)  logo.classList.add('pop');
-      }
-      function step(now){
-        const elapsed = now - start;
-        const progress = Math.min(1, elapsed / DURATION);
-        // Head of the trail's current position on the polygon perimeter
-        const idx = Math.floor(progress * (path.length - 1));
-        const p = path[idx];
-        // Spawn 2 glitter particles at the leading edge each frame
-        for (let k=0;k<2;k++){
-          const g = document.createElement('div');
-          g.className = 'preloader-glitter';
-          g.style.left = 'calc(' + p[0] + '% - 3px)';
-          g.style.top  = 'calc(' + p[1] + '% - 3px)';
-          const c = colors[Math.floor(Math.random()*colors.length)];
-          g.style.color = c; g.style.background = c;
-          const angle = Math.random() * Math.PI * 2;
-          const dist = 20 + Math.random() * 40;
-          g.style.setProperty('--dx', Math.cos(angle)*dist+'px');
-          g.style.setProperty('--dy', Math.sin(angle)*dist+'px');
-          g.style.animation = 'glitterFall ' + (600 + Math.random()*400) + 'ms ease-out forwards';
-          stage.appendChild(g);
-          setTimeout(() => g.remove(), 1100);
-        }
-        if (progress < 1) {
-          rafId = requestAnimationFrame(step);
-        } else {
-          // Border complete → fade trail, pop the logo in immediately
-          popLogo();
-        }
-      }
-      rafId = requestAnimationFrame(step);
+      // Cycle timing
+      const TRACE = 1800;   // trace star outline
+      const HOLD  = 2000;   // logo visible after pop
+      const FADE  = 500;    // fade logo out
+      const CYCLE = TRACE + HOLD + FADE;
 
-      // (fix a) Wall-clock fallback: guarantees the trail fade + logo pop
-      // fire even if RAF is throttled (e.g. background tab) or if the img
-      // took extra time to decode. Uses setTimeout which is not throttled
-      // as aggressively as RAF for this short a duration.
-      setTimeout(popLogo, DURATION + 30);
+      let stopped = false;
+      let cycleTimeouts = [];
+      let glitterTimers = [];
+      let popPending = false;
+
+      function spawnGlitter(p){
+        // single lightweight sparkle per point instead of 2
+        const g = document.createElement('div');
+        g.className = 'preloader-glitter';
+        g.style.left = 'calc(' + p[0] + '% - 3px)';
+        g.style.top  = 'calc(' + p[1] + '% - 3px)';
+        const c = colors[Math.floor(Math.random()*colors.length)];
+        g.style.color = c; g.style.background = c;
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 14 + Math.random() * 22;
+        g.style.setProperty('--dx', Math.cos(angle)*dist+'px');
+        g.style.setProperty('--dy', Math.sin(angle)*dist+'px');
+        g.style.animation = 'glitterFall ' + (500 + Math.random()*300) + 'ms ease-out forwards';
+        stage.appendChild(g);
+        setTimeout(() => g.remove(), 900);
+      }
+
+      function clearCycleTimers(){
+        cycleTimeouts.forEach(id => clearTimeout(id));
+        glitterTimers.forEach(id => clearTimeout(id));
+        cycleTimeouts = [];
+        glitterTimers = [];
+      }
+
+      function popLogoWhenReady(){
+        if (stopped) return;
+        if (!logo) return;
+        if (logoReady){
+          logo.classList.add('pop');
+        } else {
+          popPending = true;
+          const check = () => {
+            if (stopped || !popPending) return;
+            if (logoReady){
+              popPending = false;
+              logo.classList.add('pop');
+            } else {
+              setTimeout(check, 60);
+            }
+          };
+          check();
+        }
+      }
+
+      function runCycle(){
+        if (stopped) return;
+
+        // Reset visuals (disable transition, snap back, then re-enable)
+        if (trail){
+          trail.classList.add('no-anim');
+          trail.classList.remove('tracing', 'fade-out');
+          trail.style.opacity = '';
+          // force reflow so the "snap back" applies before we re-enable transition
+          void trail.getBoundingClientRect();
+          trail.classList.remove('no-anim');
+        }
+        if (outline){
+          outline.classList.remove('fade-out');
+        }
+        if (logo){
+          popPending = false;
+          logo.classList.remove('pop', 'fade-out');
+          logo.style.opacity = '';
+          logo.style.transform = '';
+          void logo.offsetWidth; // reflow so .pop can replay
+        }
+
+        // --- Trace phase driven by CSS transition (reliable even under heavy load) ---
+        // Kick off on the next frame so the reset styles commit first.
+        requestAnimationFrame(() => {
+          if (stopped) return;
+          if (trail) trail.classList.add('tracing');
+        });
+
+        // Spawn glitter along the path in parallel with the CSS transition.
+        const steps = path.length;
+        for (let i = 0; i < steps; i++){
+          const when = Math.floor((i / (steps - 1)) * TRACE);
+          glitterTimers.push(setTimeout(() => {
+            if (!stopped) spawnGlitter(path[i]);
+          }, when));
+        }
+
+        // Fade the outline out and pop the logo AS the trace completes
+        cycleTimeouts.push(setTimeout(() => {
+          if (stopped) return;
+          if (trail) trail.classList.add('fade-out');
+          if (outline) outline.classList.add('fade-out');
+          popLogoWhenReady();
+        }, TRACE));
+      }
 
       function finishPreloader(){
+        stopped = true;
+        clearCycleTimers();
         pre.classList.add('done');
         document.body.classList.remove('preloading');
         try { startTypewriter(); } catch(e) {}
         setTimeout(() => { pre.remove(); }, 700);
       }
 
-      // (b) Show website exactly 1s after the animation completes, regardless of backend load state.
-      // Animation = 2.6s trace + 0.7s pop = 3.3s. Add 1s reveal delay -> 4.3s total.
-      const REVEAL_AFTER = 2600 + 700 + 1000;
-      setTimeout(finishPreloader, REVEAL_AFTER);
+      runCycle();
+
+      // Force the preloader to disappear after at most 3 seconds,
+      // whether or not the full page has finished loading.
+      const MAX_SHOW = 5000;
+      let finished = false;
+      const finishOnce = () => { if (!finished) { finished = true; finishPreloader(); } };
+      setTimeout(finishOnce, MAX_SHOW);
+      if (document.readyState === 'complete') {
+        // Still allow a brief moment so the logo pop is visible.
+        setTimeout(finishOnce, Math.min(MAX_SHOW, TRACE + 300));
+      } else {
+        window.addEventListener('load', () => {
+          setTimeout(finishOnce, 200);
+        }, { once: true });
+      }
     })();
+
 
   </script>
 </body>
 </html>
+
