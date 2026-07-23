@@ -3159,6 +3159,293 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
 }
 @keyframes brandFade { to { opacity: 1; } }
 
+/* ============ (NEW) HEADER LOGO TRANSITION + GLOW ============ */
+.site-logo { opacity: 1; transition: opacity .35s ease; }
+.site-logo.logo-hidden { opacity: 0; pointer-events: none; }
+.site-logo.logo-glow .site-logo-img {
+  animation: siteLogoGlow 3s ease-in-out 1;
+}
+@keyframes siteLogoGlow {
+  0%   { filter: drop-shadow(0 0 0px rgba(241,130,74,0)) drop-shadow(0 0 0px rgba(241,130,74,0)); transform: scale(1); }
+  15%  { filter: drop-shadow(0 0 18px rgba(241,130,74,.95)) drop-shadow(0 0 42px rgba(241,130,74,.7)); transform: scale(1.05); }
+  50%  { filter: drop-shadow(0 0 22px rgba(255,180,120,1)) drop-shadow(0 0 55px rgba(241,130,74,.75)); transform: scale(1.02); }
+  100% { filter: drop-shadow(0 0 0px rgba(241,130,74,0)) drop-shadow(0 0 0px rgba(241,130,74,0)); transform: scale(1); }
+}
+
+/* Flying preloader logo clone */
+.preloader-flyer {
+  position: fixed;
+  z-index: 1000000;
+  pointer-events: none;
+  transition: transform 900ms cubic-bezier(.7,-0.05,.25,1),
+              width  900ms cubic-bezier(.7,-0.05,.25,1),
+              height 900ms cubic-bezier(.7,-0.05,.25,1),
+              opacity 300ms ease 700ms;
+  filter: drop-shadow(0 0 24px rgba(241,130,74,.65)) drop-shadow(0 0 60px rgba(241,130,74,.35));
+}
+.preloader-flyer img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+/* ============ (NEW) MOBILE BOTTOM NAV ============ */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  width: calc(100% - 24px);
+  max-width: 460px;
+  height: 68px;
+  z-index: 9998;
+  background: linear-gradient(180deg, rgba(20,20,20,.92) 0%, rgba(10,10,10,.96) 100%);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 26px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.55), 0 2px 0 rgba(255,255,255,.04) inset;
+  padding: 0 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+[data-theme="light"] .bottom-nav {
+  background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(248,248,248,.96));
+  border: 1px solid rgba(0,0,0,.06);
+  box-shadow: 0 18px 50px rgba(0,0,0,.15);
+}
+.bn-item {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: rgba(255,255,255,.65);
+  text-decoration: none;
+  font-size: .68rem;
+  font-weight: 500;
+  letter-spacing: .02em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: color .25s ease, transform .25s ease;
+}
+[data-theme="light"] .bn-item { color: rgba(0,0,0,.55); }
+.bn-item i { font-size: 1.1rem; }
+.bn-item.active,
+.bn-item:hover { color: var(--accent); }
+.bn-item.active::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  width: 26px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--gradient-accent);
+  box-shadow: 0 0 10px rgba(241,130,74,.7);
+}
+.bn-center-wrap {
+  flex: 0 0 78px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.bn-center {
+  position: absolute;
+  top: -30px;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: var(--gradient-accent);
+  border: 4px solid var(--white);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(241,130,74,.55), 0 0 0 rgba(241,130,74,.5);
+  transition: transform .5s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease;
+  animation: bnCenterPulse 2.4s ease-in-out infinite;
+}
+@keyframes bnCenterPulse {
+  0%,100% { box-shadow: 0 12px 30px rgba(241,130,74,.55), 0 0 0 0 rgba(241,130,74,.55); }
+  50%     { box-shadow: 0 12px 30px rgba(241,130,74,.55), 0 0 0 14px rgba(241,130,74,0); }
+}
+.bn-center i {
+  font-size: 1.35rem;
+  transition: transform .45s cubic-bezier(.34,1.56,.64,1);
+}
+.bn-center.open i { transform: rotate(135deg); }
+.bn-center.open { transform: scale(1.08) rotate(0deg); }
+.bn-center-label {
+  position: absolute;
+  bottom: 6px;
+  font-size: .62rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+/* ============ (NEW) 3D SERVICES CAROUSEL OVERLAY ============ */
+.svc3d-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9996;
+  background: radial-gradient(ellipse at center, rgba(10,10,10,.55) 0%, rgba(0,0,0,.88) 70%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .4s ease, visibility .4s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+/* Perspective on the stage itself so backdrop-filter on the overlay
+   cannot flatten the 3D ring (filter/backdrop-filter creates a flat
+   grouping context that kills descendant 3D transforms). */
+.svc3d-stage { perspective: 1200px; }
+@media (max-width: 768px) {
+  .svc3d-stage { perspective: 900px; }
+}
+.svc3d-overlay.open { opacity: 1; visibility: visible; }
+.svc3d-close-hint {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,.6);
+  font-size: .75rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.svc3d-stage {
+  width: 260px;
+  height: 340px;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: translateZ(0) scale(.02);
+  opacity: 0;
+  transition: transform .7s cubic-bezier(.34,1.56,.64,1), opacity .4s ease;
+}
+.svc3d-overlay.open .svc3d-stage {
+  transform: translateZ(0) scale(1);
+  opacity: 1;
+}
+.svc3d-overlay.closing .svc3d-stage {
+  transform: translateZ(0) scale(.02);
+  opacity: 0;
+  transition: transform .55s cubic-bezier(.55,-0.05,.5,.05), opacity .35s ease .1s;
+}
+.svc3d-ring {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+  /* Rotation is driven by JS so we can combine auto-rotate with manual swipe. */
+}
+.svc3d-ring.dragging { cursor: grabbing; }
+.svc3d-stage { cursor: grab; }
+.svc3d-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #1a1a1a center/cover no-repeat;
+  box-shadow: 0 24px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08) inset;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-decoration: none;
+  transition: box-shadow .3s ease, outline-color .3s ease;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  cursor: pointer;
+}
+.svc3d-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.35) 45%, rgba(0,0,0,.85) 100%);
+  transition: background .3s ease;
+}
+.svc3d-card:hover,
+.svc3d-card.is-active {
+  box-shadow: 0 30px 70px rgba(241,130,74,.35), 0 0 0 2px rgba(241,130,74,.9) inset;
+  outline-color: rgba(241,130,74,.9);
+}
+.svc3d-card:hover::before,
+.svc3d-card.is-active::before {
+  background: linear-gradient(180deg, rgba(241,130,74,.35) 0%, rgba(0,0,0,.35) 45%, rgba(0,0,0,.85) 100%);
+}
+.svc3d-card-body {
+  position: relative;
+  padding: 20px 18px;
+  z-index: 2;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+.svc3d-card-body h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  margin: 0 0 10px;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0,0,0,.7);
+}
+.svc3d-card-body p {
+  font-size: .82rem;
+  line-height: 1.4;
+  margin: 0;
+  color: rgba(255,255,255,.92);
+  text-shadow: 0 1px 8px rgba(0,0,0,.8);
+}
+
+/* Mobile: smaller cards so they don't dominate the screen but still fan out */
+@media (max-width: 900px) {
+  .svc3d-stage { width: 160px; height: 220px; }
+  .svc3d-card { border-radius: 18px; }
+  .svc3d-card-body { padding: 14px 12px; }
+  .svc3d-card-body h4 { font-size: 1rem; margin-bottom: 6px; }
+  .svc3d-card-body p { font-size: .72rem; line-height: 1.35; }
+  .svc3d-close-hint { font-size: .65rem; top: 14px; }
+}
+@media (max-width: 480px) {
+  .svc3d-stage { width: 135px; height: 190px; }
+  .svc3d-card { border-radius: 16px; }
+  .svc3d-card-body { padding: 12px 10px; }
+  .svc3d-card-body h4 { font-size: .9rem; margin-bottom: 5px; }
+  .svc3d-card-body p { font-size: .66rem; line-height: 1.3; }
+}
+@media (max-width: 360px) {
+  .svc3d-stage { width: 118px; height: 168px; }
+  .svc3d-card-body { padding: 10px 8px; }
+  .svc3d-card-body h4 { font-size: .82rem; }
+  .svc3d-card-body p { font-size: .6rem; }
+}
+
+/* Show bottom nav & hide old mobile menu on small screens */
+@media (max-width: 768px) {
+  .bottom-nav { display: flex; }
+  .mobile-menu-btn { display: none !important; }
+  .mobile-nav, .mobile-overlay { display: none !important; }
+  body { padding-bottom: 90px; }
+  .dark-mode-toggle { bottom: 170px !important; }
+  /* Lift floating action buttons above nav pill */
+  .whatsapp-float, .scroll-top, .chatbot-toggle { bottom: 100px !important; }
+}
+
+
 /* ============ (e) FEATURED VENUE THUMB — smaller on desktop ============ */
 @media (min-width: 1025px) {
   .venue-thumbs {
@@ -3461,9 +3748,9 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
 
   <!-- Navigation -->
   <nav class="navbar" id="navbar">
-    <a href="#" class="logo">
-    <img src="https://raw.githubusercontent.com/widestarpk/home/refs/heads/main/logo_white.png" alt="WideStar Logo" class="site-logo-img">
-</a>
+    <a href="#" class="logo site-logo" id="siteLogo">
+      <img src="https://raw.githubusercontent.com/widestarpk/home/refs/heads/main/logo_white.png" alt="WideStar Logo" class="site-logo-img" id="siteLogoImg">
+    </a>
     <ul class="nav-links">
       <li><a href="#">Home</a></li>
             <li><a href="#venues">Venues</a></li>
@@ -3493,6 +3780,28 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
       <i class="fas fa-bars"></i>
     </button>
   </nav>
+  <!-- (NEW) Mobile Bottom Navigation -->
+  <nav class="bottom-nav" id="bottomNav" aria-label="Mobile navigation">
+    <a href="#" class="bn-item active" data-bn="home"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="#venues" class="bn-item" data-bn="venues"><i class="fas fa-map-marker-alt"></i><span>Venues</span></a>
+    <div class="bn-center-wrap">
+      <button class="bn-center" id="bnCenter" aria-label="Book Now" aria-expanded="false">
+        <i class="fas fa-plus"></i>
+      </button>
+      <span class="bn-center-label">Book</span>
+    </div>
+    <a href="https://widestar.pk/vendor-registration" class="bn-item" data-bn="vendor"><i class="fas fa-handshake"></i><span>Vendor</span></a>
+    <a href="https://www.widestar.pk/contact" target="_blank" rel="noopener" class="bn-item" data-bn="contact"><i class="fas fa-phone"></i><span>Contact</span></a>
+  </nav>
+
+  <!-- (NEW) 3D Services Carousel Overlay -->
+  <div class="svc3d-overlay" id="svc3dOverlay" aria-hidden="true">
+    <div class="svc3d-close-hint">Tap outside or the + button to close</div>
+    <div class="svc3d-stage" id="svc3dStage">
+      <div class="svc3d-ring" id="svc3dRing"></div>
+    </div>
+  </div>
+
 
   <!-- Mobile Navigation -->
   <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileNav()"></div>
@@ -5182,6 +5491,9 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
     // INITIALIZATION
     // =====================================
     document.addEventListener('DOMContentLoaded', () => {
+      // (NEW) Hide header logo until preloader flies it into place
+      const _hl = document.getElementById('siteLogo');
+      if (_hl) _hl.classList.add('logo-hidden');
       loadTheme();
       // Typewriter and hero bg cycle start after preloader completes
       // typeWriter() intentionally not called here
@@ -5377,13 +5689,37 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
         }, TRACE));
       }
 
+      function flyLogoToHeader(done){
+        // (Revised) No translate + scale. Simply cross-fade:
+        //   preloader logo fades out, header logo fades in with glow.
+        const headerLogo = document.getElementById('siteLogo');
+        if (logo) logo.classList.add('fade-out');
+        if (headerLogo) {
+          // Reveal on next frame so the fade-in transition actually runs.
+          requestAnimationFrame(() => {
+            headerLogo.classList.remove('logo-hidden');
+            headerLogo.classList.add('logo-glow');
+            setTimeout(() => headerLogo.classList.remove('logo-glow'), 3200);
+          });
+        }
+        setTimeout(() => { done && done(); }, 500);
+      }
+
       function finishPreloader(){
         stopped = true;
         clearCycleTimers();
-        pre.classList.add('done');
+        // Fade out the star trail/outline but keep #preloader visible briefly for the fly transition.
+        if (trail)   trail.classList.add('fade-out');
+        if (outline) outline.classList.add('fade-out');
+        // Fade the preloader background to reveal the site while logo flies to header
+        pre.style.background = 'transparent';
+        pre.style.pointerEvents = 'none';
         document.body.classList.remove('preloading');
         try { startTypewriter(); } catch(e) {}
-        setTimeout(() => { pre.remove(); }, 700);
+        flyLogoToHeader(() => {
+          pre.classList.add('done');
+          setTimeout(() => { pre.remove(); }, 700);
+        });
       }
 
       runCycle();
@@ -5402,6 +5738,206 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
           setTimeout(finishOnce, 200);
         }, { once: true });
       }
+    })();
+
+
+    // ===================================================
+    // (NEW) BOTTOM NAV + 3D SERVICES CAROUSEL
+    // ===================================================
+    (function initBottomNav(){
+      const centerBtn = document.getElementById('bnCenter');
+      const overlay   = document.getElementById('svc3dOverlay');
+      const ring      = document.getElementById('svc3dRing');
+      const stage     = document.getElementById('svc3dStage');
+      if (!centerBtn || !overlay || !ring || !stage) return;
+
+      let built = false;
+      let isOpen = false;
+
+      // Rotation state (degrees). Auto-rotate direction is REVERSED (negative speed).
+      let angle = 0;
+      let velocity = -0.18;           // deg per frame (negative = reversed direction)
+      const AUTO_SPEED = -0.18;
+      let dragging = false;
+      let paused = false;
+      let lastX = 0;
+      let lastMoveTime = 0;
+      let lastDelta = 0;
+      let rafId = null;
+
+      function applyTransform(){
+        ring.style.transform = 'rotateY(' + angle.toFixed(3) + 'deg)';
+      }
+
+      function tick(){
+        if (!isOpen) { rafId = null; return; }
+        if (!dragging && !paused) {
+          angle += velocity;
+          // Ease flung velocity back toward auto-speed
+          if (Math.abs(velocity - AUTO_SPEED) > 0.001) {
+            velocity += (AUTO_SPEED - velocity) * 0.04;
+          } else {
+            velocity = AUTO_SPEED;
+          }
+        }
+        applyTransform();
+        rafId = requestAnimationFrame(tick);
+      }
+
+      function buildRing(){
+        if (built) return;
+        const data = (typeof servicesData !== 'undefined' && servicesData && servicesData.length)
+          ? servicesData
+          : [{ name:'Book a Venue', image:'', description:'' }];
+        const items = data.slice(0, 8);
+        const n = items.length;
+        // Radius tuned so ≥3 cards are visible on mobile.
+        const isMobile = window.matchMedia('(max-width: 900px)').matches;
+        const stageWidth = stage.offsetWidth || (isMobile ? 140 : 260);
+        const viewportW = window.innerWidth || document.documentElement.clientWidth;
+        // Min radius so adjacent cards don't overlap the front card.
+        const minRadius = stageWidth / (2 * Math.sin(Math.PI / Math.max(n, 3))) + 6;
+        // Cap radius so ring width (card + 2*radius*sin(360/n)) fits viewport with padding,
+        // ensuring at least 3 cards remain visible without clipping.
+        const step = (2 * Math.PI) / n;
+        const maxRadius = Math.max(
+          minRadius,
+          ((viewportW - stageWidth - 32) / 2) / Math.max(Math.sin(step), 0.01)
+        );
+        const desired = isMobile
+          ? Math.round(stageWidth * 1.35)
+          : Math.round(stageWidth * 1.35);
+        const radius = Math.min(Math.max(minRadius, desired), maxRadius);
+        ring.innerHTML = items.map((svc, i) => {
+          const a = (360 / n) * i;
+          const slug = (svc.name || 'service').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+          const href = '/service/' + slug;
+          return '<a href="' + href + '" class="svc3d-card" data-idx="' + i + '" style="background-image:url(\'' + (svc.image||'') + '\'); transform: rotateY(' + a + 'deg) translateZ(' + radius + 'px);">' +
+                   '<div class="svc3d-card-body">' +
+                     '<h4>' + (svc.name || 'Service') + '</h4>' +
+                     '<p>' + (svc.description || '') + '</p>' +
+                   '</div>' +
+                 '</a>';
+        }).join('');
+        built = true;
+      }
+
+      function openCarousel(){
+        buildRing();
+        isOpen = true;
+        overlay.classList.remove('closing');
+        overlay.classList.add('open');
+        overlay.setAttribute('aria-hidden','false');
+        centerBtn.classList.add('open');
+        centerBtn.setAttribute('aria-expanded','true');
+        document.body.style.overflow = 'hidden';
+        // Always start with "Book a Venue" (first item) facing the viewer
+        angle = 0;
+        velocity = AUTO_SPEED;
+        applyTransform();
+        if (!rafId) rafId = requestAnimationFrame(tick);
+      }
+      function closeCarousel(){
+        if (!isOpen) return;
+        isOpen = false;
+        overlay.classList.add('closing');
+        overlay.classList.remove('open');
+        overlay.setAttribute('aria-hidden','true');
+        centerBtn.classList.remove('open');
+        centerBtn.setAttribute('aria-expanded','false');
+        document.body.style.overflow = '';
+        setTimeout(() => overlay.classList.remove('closing'), 600);
+      }
+
+      centerBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        isOpen ? closeCarousel() : openCarousel();
+      });
+
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay || e.target.classList.contains('svc3d-close-hint')) closeCarousel();
+      });
+
+      overlay.addEventListener('click', (e) => {
+        if (e.target.closest('[data-close-svc3d]')) setTimeout(closeCarousel, 50);
+      });
+
+      // ---------- Manual drag / swipe (loose, momentum-based) ----------
+      const DRAG_SENSITIVITY = 0.35; // deg per px
+      let dragStartX = 0;
+      let dragTotal = 0;
+
+      function onPointerDown(e){
+        dragging = true;
+        ring.classList.add('dragging');
+        lastX = (e.touches ? e.touches[0].clientX : e.clientX);
+        dragStartX = lastX;
+        dragTotal = 0;
+        lastMoveTime = performance.now();
+        lastDelta = 0;
+        if (!rafId && isOpen) rafId = requestAnimationFrame(tick);
+      }
+      function onPointerMove(e){
+        if (!dragging) return;
+        const x = (e.touches ? e.touches[0].clientX : e.clientX);
+        const dx = x - lastX;
+        lastX = x;
+        dragTotal += Math.abs(dx);
+        const now = performance.now();
+        const dt = Math.max(1, now - lastMoveTime);
+        lastMoveTime = now;
+        const delta = dx * DRAG_SENSITIVITY;
+        angle += delta;
+        lastDelta = (delta / dt) * 16;
+        if (e.cancelable) e.preventDefault();
+      }
+      function onPointerUp(){
+        if (!dragging) return;
+        dragging = false;
+        ring.classList.remove('dragging');
+        velocity = Math.max(-25, Math.min(25, lastDelta));
+        if (Math.abs(velocity) < Math.abs(AUTO_SPEED)) velocity = AUTO_SPEED;
+      }
+
+      // Cancel card navigation if the user was dragging/swiping the ring
+      ring.addEventListener('click', (e) => {
+        if (dragTotal > 6) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+
+      stage.addEventListener('mousedown', onPointerDown);
+      window.addEventListener('mousemove', onPointerMove);
+      window.addEventListener('mouseup', onPointerUp);
+      stage.addEventListener('touchstart', onPointerDown, {passive:true});
+      stage.addEventListener('touchmove', onPointerMove, {passive:false});
+      stage.addEventListener('touchend', onPointerUp);
+      stage.addEventListener('touchcancel', onPointerUp);
+
+      // Rebuild ring on orientation/resize for correct radius
+      window.addEventListener('resize', () => {
+        if (built) { built = false; buildRing(); }
+      });
+
+      // ESC closes
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isOpen) closeCarousel();
+      });
+
+      // Highlight active bottom-nav item on scroll to sections
+      const bnItems = document.querySelectorAll('.bn-item[data-bn]');
+      const mapping = { home: null, venues: 'venues', reviews: 'testimonials' };
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY + 120;
+        let activeKey = 'home';
+        Object.entries(mapping).forEach(([k, id]) => {
+          if (!id) return;
+          const el = document.getElementById(id);
+          if (el && el.offsetTop <= y) activeKey = k;
+        });
+        bnItems.forEach(a => a.classList.toggle('active', a.dataset.bn === activeKey));
+      }, { passive:true });
     })();
 
 
