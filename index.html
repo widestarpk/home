@@ -3289,149 +3289,163 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
   text-transform: uppercase;
 }
 
-/* ============ (NEW) 3D SERVICES CAROUSEL OVERLAY ============ */
+/* ============ (NEW) SERVICES EXPAND OVERLAY ============ */
 .svc3d-overlay {
   position: fixed;
   inset: 0;
   z-index: 9996;
-  background: radial-gradient(ellipse at center, rgba(10,10,10,.55) 0%, rgba(0,0,0,.88) 70%);
+  background: radial-gradient(ellipse at center, rgba(10,10,10,.65) 0%, rgba(0,0,0,.92) 70%);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   opacity: 0;
   visibility: hidden;
-  transition: opacity .4s ease, visibility .4s ease;
+  transition: opacity .35s ease, visibility .35s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-}
-/* Perspective on the stage itself so backdrop-filter on the overlay
-   cannot flatten the 3D ring (filter/backdrop-filter creates a flat
-   grouping context that kills descendant 3D transforms). */
-.svc3d-stage { perspective: 1200px; }
-@media (max-width: 768px) {
-  .svc3d-stage { perspective: 900px; }
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 90px 16px 140px;
 }
 .svc3d-overlay.open { opacity: 1; visibility: visible; }
 .svc3d-close-hint {
-  position: absolute;
+  position: fixed;
   top: 22px;
   left: 50%;
   transform: translateX(-50%);
   color: rgba(255,255,255,.6);
-  font-size: .75rem;
+  font-size: .72rem;
   letter-spacing: .18em;
   text-transform: uppercase;
   font-weight: 500;
-}
-.svc3d-stage {
-  width: 260px;
-  height: 340px;
-  position: relative;
-  transform-style: preserve-3d;
-  transform: translateZ(0) scale(.02);
-  opacity: 0;
-  transition: transform .7s cubic-bezier(.34,1.56,.64,1), opacity .4s ease;
-}
-.svc3d-overlay.open .svc3d-stage {
-  transform: translateZ(0) scale(1);
-  opacity: 1;
-}
-.svc3d-overlay.closing .svc3d-stage {
-  transform: translateZ(0) scale(.02);
-  opacity: 0;
-  transition: transform .55s cubic-bezier(.55,-0.05,.5,.05), opacity .35s ease .1s;
-}
-.svc3d-ring {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-  will-change: transform;
-  /* Rotation is driven by JS so we can combine auto-rotate with manual swipe. */
-}
-.svc3d-ring.dragging { cursor: grabbing; }
-.svc3d-stage { cursor: grab; }
-.svc3d-card {
-  position: absolute;
-  inset: 0;
-  border-radius: 22px;
-  overflow: hidden;
-  background: #1a1a1a center/cover no-repeat;
-  box-shadow: 0 24px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08) inset;
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-decoration: none;
-  transition: box-shadow .3s ease, outline-color .3s ease;
-  outline: 2px solid transparent;
-  outline-offset: -2px;
-  cursor: pointer;
-}
-.svc3d-card::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.35) 45%, rgba(0,0,0,.85) 100%);
-  transition: background .3s ease;
-}
-.svc3d-card:hover,
-.svc3d-card.is-active {
-  box-shadow: 0 30px 70px rgba(241,130,74,.35), 0 0 0 2px rgba(241,130,74,.9) inset;
-  outline-color: rgba(241,130,74,.9);
-}
-.svc3d-card:hover::before,
-.svc3d-card.is-active::before {
-  background: linear-gradient(180deg, rgba(241,130,74,.35) 0%, rgba(0,0,0,.35) 45%, rgba(0,0,0,.85) 100%);
-}
-.svc3d-card-body {
-  position: relative;
-  padding: 20px 18px;
+  pointer-events: none;
   z-index: 2;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
-}
-.svc3d-card-body h4 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.35rem;
-  line-height: 1.2;
-  margin: 0 0 10px;
-  color: #fff;
-  text-shadow: 0 2px 12px rgba(0,0,0,.7);
-}
-.svc3d-card-body p {
-  font-size: .82rem;
-  line-height: 1.4;
-  margin: 0;
-  color: rgba(255,255,255,.92);
-  text-shadow: 0 1px 8px rgba(0,0,0,.8);
 }
 
-/* Mobile: smaller cards so they don't dominate the screen but still fan out */
-@media (max-width: 900px) {
-  .svc3d-stage { width: 160px; height: 220px; }
-  .svc3d-card { border-radius: 18px; }
-  .svc3d-card-body { padding: 14px 12px; }
-  .svc3d-card-body h4 { font-size: 1rem; margin-bottom: 6px; }
-  .svc3d-card-body p { font-size: .72rem; line-height: 1.35; }
-  .svc3d-close-hint { font-size: .65rem; top: 14px; }
+/* Static grid stage */
+/* Stage: 3 columns, middle column centered horizontally and offset vertically
+   so it interleaves between the outer columns — matches the screenshot. */
+.svc3d-stage {
+  --card: 128px;              /* circle diameter (mobile) */
+  --arc-h: 46px;              /* space reserved for curved label above circle */
+  --row-gap: 18px;
+  --col-gap: 6px;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: start;
+  justify-items: center;
+  padding: 10px 4px;
 }
-@media (max-width: 480px) {
-  .svc3d-stage { width: 135px; height: 190px; }
-  .svc3d-card { border-radius: 16px; }
-  .svc3d-card-body { padding: 12px 10px; }
-  .svc3d-card-body h4 { font-size: .9rem; margin-bottom: 5px; }
-  .svc3d-card-body p { font-size: .66rem; line-height: 1.3; }
+.svc3d-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--row-gap);
+  width: 100%;
 }
-@media (max-width: 360px) {
-  .svc3d-stage { width: 118px; height: 168px; }
-  .svc3d-card-body { padding: 10px 8px; }
-  .svc3d-card-body h4 { font-size: .82rem; }
-  .svc3d-card-body p { font-size: .6rem; }
+.svc3d-col--mid {
+  /* Push middle column down so its circles sit between the outer rows */
+  transform: translateY(calc((var(--card) + var(--arc-h) + var(--row-gap)) / 2));
+}
+
+/* Each card = curved label (SVG arc) + circular image */
+.svc3d-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: #fff;
+  width: var(--card);
+  opacity: 0;
+  transform: scale(.35) translateY(14px);
+  transition:
+    transform .55s cubic-bezier(.34,1.56,.64,1),
+    opacity .4s ease;
+  cursor: pointer;
+}
+.svc3d-overlay.open .svc3d-card {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+.svc3d-overlay.closing .svc3d-card {
+  opacity: 0;
+  transform: scale(.25) translateY(8px);
+  transition:
+    transform .35s cubic-bezier(.55,-0.05,.5,.05),
+    opacity .3s ease;
+}
+
+/* Curved label sits above the circle, following its top arc */
+.svc3d-arc {
+  width: calc(var(--card) + 40px);
+  height: var(--arc-h);
+  margin-bottom: -6px;       /* nestle label against top of circle */
+  overflow: visible;
+  pointer-events: none;
+  display: block;
+}
+.svc3d-arc text {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 15px;
+  fill: #fff;
+  letter-spacing: .3px;
+  paint-order: stroke;
+  stroke: rgba(0,0,0,.85);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.svc3d-card-img {
+  width: var(--card);
+  height: var(--card);
+  border-radius: 50%;
+  background: #1a1a1a center/cover no-repeat;
+  border: 3px solid #0a0a0a;
+  box-shadow:
+    0 10px 24px rgba(0,0,0,.6),
+    0 0 0 2px rgba(255,255,255,.04);
+  transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+}
+.svc3d-card:hover .svc3d-card-img,
+.svc3d-card:focus-visible .svc3d-card-img,
+.svc3d-card.is-active .svc3d-card-img {
+  transform: scale(1.07);
+  border-color: var(--accent);
+  box-shadow:
+    0 16px 38px rgba(241,130,74,.45),
+    0 0 0 3px rgba(241,130,74,.95),
+    0 0 28px rgba(241,130,74,.4);
+}
+.svc3d-card:hover .svc3d-arc text,
+.svc3d-card.is-active .svc3d-arc text {
+  fill: var(--accent);
+}
+.svc3d-card:focus { outline: none; }
+
+/* Small phones */
+@media (max-width: 400px) {
+  .svc3d-stage { --card: 108px; --arc-h: 42px; --row-gap: 14px; }
+  .svc3d-arc text { font-size: 13px; }
+}
+@media (max-width: 340px) {
+  .svc3d-stage { --card: 94px; --arc-h: 38px; --row-gap: 12px; }
+  .svc3d-arc text { font-size: 12px; }
+}
+
+/* Tablet & desktop — same interleaved 3-column layout, bigger circles */
+@media (min-width: 601px) {
+  .svc3d-stage { --card: 160px; --arc-h: 54px; --row-gap: 22px; max-width: 640px; }
+  .svc3d-arc text { font-size: 17px; }
+}
+@media (min-width: 900px) {
+  .svc3d-stage { --card: 180px; --arc-h: 58px; --row-gap: 26px; max-width: 720px; }
+  .svc3d-arc text { font-size: 18px; }
 }
 
 /* Show bottom nav & hide old mobile menu on small screens */
@@ -3796,10 +3810,8 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
 
   <!-- (NEW) 3D Services Carousel Overlay -->
   <div class="svc3d-overlay" id="svc3dOverlay" aria-hidden="true">
-    <div class="svc3d-close-hint">Tap outside or the + button to close</div>
-    <div class="svc3d-stage" id="svc3dStage">
-      <div class="svc3d-ring" id="svc3dRing"></div>
-    </div>
+    <div class="svc3d-close-hint">Tap outside or the × button to close</div>
+    <div class="svc3d-stage" id="svc3dStage"></div>
   </div>
 
 
@@ -5747,83 +5759,86 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
     (function initBottomNav(){
       const centerBtn = document.getElementById('bnCenter');
       const overlay   = document.getElementById('svc3dOverlay');
-      const ring      = document.getElementById('svc3dRing');
       const stage     = document.getElementById('svc3dStage');
-      if (!centerBtn || !overlay || !ring || !stage) return;
+      if (!centerBtn || !overlay || !stage) return;
 
       let built = false;
       let isOpen = false;
 
-      // Rotation state (degrees). Auto-rotate direction is REVERSED (negative speed).
-      let angle = 0;
-      let velocity = -0.18;           // deg per frame (negative = reversed direction)
-      const AUTO_SPEED = -0.18;
-      let dragging = false;
-      let paused = false;
-      let lastX = 0;
-      let lastMoveTime = 0;
-      let lastDelta = 0;
-      let rafId = null;
-
-      function applyTransform(){
-        ring.style.transform = 'rotateY(' + angle.toFixed(3) + 'deg)';
+      function slugify(name){
+        return (name || 'service')
+          .toLowerCase()
+          .replace(/&/g,'and')
+          .replace(/[^a-z0-9]+/g,'-')
+          .replace(/(^-|-$)/g,'');
       }
 
-      function tick(){
-        if (!isOpen) { rafId = null; return; }
-        if (!dragging && !paused) {
-          angle += velocity;
-          // Ease flung velocity back toward auto-speed
-          if (Math.abs(velocity - AUTO_SPEED) > 0.001) {
-            velocity += (AUTO_SPEED - velocity) * 0.04;
-          } else {
-            velocity = AUTO_SPEED;
-          }
-        }
-        applyTransform();
-        rafId = requestAnimationFrame(tick);
+      // Order & labels mirror the reference screenshot exactly.
+      const displayOrder = {
+        left:  ['Wedding Album',    'Moviemaking',   'Bridal Wear',   'Catering Service'],
+        mid:   ['Drone Coverage',   'Bridal Makeup', 'Decor Service', 'Venue Booking'],
+        right: ['Bridal Jewelry',   'Car Renting',   'Henna Artists', 'Photography'],
+      };
+      const labelToSource = {
+        'Wedding Album':    'Wedding Album',
+        'Moviemaking':      'Event Highlights',
+        'Bridal Wear':      'Bridal Wear & Shoes',
+        'Catering Service': 'Catering Service',
+        'Drone Coverage':   'Drone Coverage',
+        'Bridal Makeup':    'Bridal Makeup Service',
+        'Decor Service':    'Decor Service',
+        'Venue Booking':    'Book a Venue',
+        'Bridal Jewelry':   'Jewelry & Accessories',
+        'Car Renting':      'Rent a Car',
+        'Henna Artists':    'Henna Artists',
+        'Photography':      'Hire a Photographer',
+      };
+
+      function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+      function cardHTML(label, i, delay){
+        const src = labelToSource[label] || label;
+        const list = (typeof servicesData !== 'undefined' ? servicesData : []);
+        const svc = list.find(s => s.name === src) || {};
+        const href = '/service/' + slugify(label);
+        const img  = (svc.image || '').replace(/'/g,'%27');
+        const arcId = 'svc3d-arc-' + i;
+        const arc = ''
+          + '<svg class="svc3d-arc" viewBox="0 0 200 60" aria-hidden="true">'
+          +   '<defs><path id="' + arcId + '" d="M 10,60 A 90,90 0 0 1 190,60" fill="none"/></defs>'
+          +   '<text><textPath href="#' + arcId + '" startOffset="50%" text-anchor="middle">'
+          +     esc(label)
+          +   '</textPath></text>'
+          + '</svg>';
+        return '<a href="' + href + '" class="svc3d-card" data-label="' + esc(label) + '" style="transition-delay:' + delay + 'ms">'
+             +   arc
+             +   '<div class="svc3d-card-img" style="background-image:url(\'' + img + '\')"></div>'
+             + '</a>';
       }
 
-      function buildRing(){
+      function buildStage(){
         if (built) return;
-        const data = (typeof servicesData !== 'undefined' && servicesData && servicesData.length)
-          ? servicesData
-          : [{ name:'Book a Venue', image:'', description:'' }];
-        const items = data.slice(0, 8);
-        const n = items.length;
-        // Radius tuned so ≥3 cards are visible on mobile.
-        const isMobile = window.matchMedia('(max-width: 900px)').matches;
-        const stageWidth = stage.offsetWidth || (isMobile ? 140 : 260);
-        const viewportW = window.innerWidth || document.documentElement.clientWidth;
-        // Min radius so adjacent cards don't overlap the front card.
-        const minRadius = stageWidth / (2 * Math.sin(Math.PI / Math.max(n, 3))) + 6;
-        // Cap radius so ring width (card + 2*radius*sin(360/n)) fits viewport with padding,
-        // ensuring at least 3 cards remain visible without clipping.
-        const step = (2 * Math.PI) / n;
-        const maxRadius = Math.max(
-          minRadius,
-          ((viewportW - stageWidth - 32) / 2) / Math.max(Math.sin(step), 0.01)
-        );
-        const desired = isMobile
-          ? Math.round(stageWidth * 1.35)
-          : Math.round(stageWidth * 1.35);
-        const radius = Math.min(Math.max(minRadius, desired), maxRadius);
-        ring.innerHTML = items.map((svc, i) => {
-          const a = (360 / n) * i;
-          const slug = (svc.name || 'service').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
-          const href = '/service/' + slug;
-          return '<a href="' + href + '" class="svc3d-card" data-idx="' + i + '" style="background-image:url(\'' + (svc.image||'') + '\'); transform: rotateY(' + a + 'deg) translateZ(' + radius + 'px);">' +
-                   '<div class="svc3d-card-body">' +
-                     '<h4>' + (svc.name || 'Service') + '</h4>' +
-                     '<p>' + (svc.description || '') + '</p>' +
-                   '</div>' +
-                 '</a>';
-        }).join('');
+        const cols = ['left','mid','right'];
+        const colHTML = {};
+        let i = 0;
+        cols.forEach(col => {
+          colHTML[col] = displayOrder[col].map((label, rowIdx) => {
+            const delay = rowIdx * 70 + (col === 'mid' ? 0 : 40);
+            const html = cardHTML(label, i, delay);
+            i++;
+            return html;
+          }).join('');
+        });
+        stage.innerHTML =
+            '<div class="svc3d-col svc3d-col--left">'  + colHTML.left  + '</div>'
+          + '<div class="svc3d-col svc3d-col--mid">'   + colHTML.mid   + '</div>'
+          + '<div class="svc3d-col svc3d-col--right">' + colHTML.right + '</div>';
         built = true;
       }
 
-      function openCarousel(){
-        buildRing();
+
+      function openOverlay(){
+        buildStage();
         isOpen = true;
         overlay.classList.remove('closing');
         overlay.classList.add('open');
@@ -5831,13 +5846,8 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
         centerBtn.classList.add('open');
         centerBtn.setAttribute('aria-expanded','true');
         document.body.style.overflow = 'hidden';
-        // Always start with "Book a Venue" (first item) facing the viewer
-        angle = 0;
-        velocity = AUTO_SPEED;
-        applyTransform();
-        if (!rafId) rafId = requestAnimationFrame(tick);
       }
-      function closeCarousel(){
+      function closeOverlay(){
         if (!isOpen) return;
         isOpen = false;
         overlay.classList.add('closing');
@@ -5846,83 +5856,32 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
         centerBtn.classList.remove('open');
         centerBtn.setAttribute('aria-expanded','false');
         document.body.style.overflow = '';
-        setTimeout(() => overlay.classList.remove('closing'), 600);
+        setTimeout(() => overlay.classList.remove('closing'), 500);
       }
 
       centerBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        isOpen ? closeCarousel() : openCarousel();
+        isOpen ? closeOverlay() : openOverlay();
       });
 
+      // Click backdrop / hint to close
       overlay.addEventListener('click', (e) => {
-        if (e.target === overlay || e.target.classList.contains('svc3d-close-hint')) closeCarousel();
-      });
-
-      overlay.addEventListener('click', (e) => {
-        if (e.target.closest('[data-close-svc3d]')) setTimeout(closeCarousel, 50);
-      });
-
-      // ---------- Manual drag / swipe (loose, momentum-based) ----------
-      const DRAG_SENSITIVITY = 0.35; // deg per px
-      let dragStartX = 0;
-      let dragTotal = 0;
-
-      function onPointerDown(e){
-        dragging = true;
-        ring.classList.add('dragging');
-        lastX = (e.touches ? e.touches[0].clientX : e.clientX);
-        dragStartX = lastX;
-        dragTotal = 0;
-        lastMoveTime = performance.now();
-        lastDelta = 0;
-        if (!rafId && isOpen) rafId = requestAnimationFrame(tick);
-      }
-      function onPointerMove(e){
-        if (!dragging) return;
-        const x = (e.touches ? e.touches[0].clientX : e.clientX);
-        const dx = x - lastX;
-        lastX = x;
-        dragTotal += Math.abs(dx);
-        const now = performance.now();
-        const dt = Math.max(1, now - lastMoveTime);
-        lastMoveTime = now;
-        const delta = dx * DRAG_SENSITIVITY;
-        angle += delta;
-        lastDelta = (delta / dt) * 16;
-        if (e.cancelable) e.preventDefault();
-      }
-      function onPointerUp(){
-        if (!dragging) return;
-        dragging = false;
-        ring.classList.remove('dragging');
-        velocity = Math.max(-25, Math.min(25, lastDelta));
-        if (Math.abs(velocity) < Math.abs(AUTO_SPEED)) velocity = AUTO_SPEED;
-      }
-
-      // Cancel card navigation if the user was dragging/swiping the ring
-      ring.addEventListener('click', (e) => {
-        if (dragTotal > 6) {
-          e.preventDefault();
-          e.stopPropagation();
+        if (e.target === overlay || e.target.classList.contains('svc3d-close-hint') || e.target.classList.contains('svc3d-stage')) {
+          closeOverlay();
         }
-      }, true);
+      });
 
-      stage.addEventListener('mousedown', onPointerDown);
-      window.addEventListener('mousemove', onPointerMove);
-      window.addEventListener('mouseup', onPointerUp);
-      stage.addEventListener('touchstart', onPointerDown, {passive:true});
-      stage.addEventListener('touchmove', onPointerMove, {passive:false});
-      stage.addEventListener('touchend', onPointerUp);
-      stage.addEventListener('touchcancel', onPointerUp);
-
-      // Rebuild ring on orientation/resize for correct radius
-      window.addEventListener('resize', () => {
-        if (built) { built = false; buildRing(); }
+      // Highlight tapped card briefly before navigation (visual feedback)
+      stage.addEventListener('click', (e) => {
+        const card = e.target.closest('.svc3d-card');
+        if (!card) return;
+        stage.querySelectorAll('.svc3d-card.is-active').forEach(c => c.classList.remove('is-active'));
+        card.classList.add('is-active');
       });
 
       // ESC closes
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && isOpen) closeCarousel();
+        if (e.key === 'Escape' && isOpen) closeOverlay();
       });
 
       // Highlight active bottom-nav item on scroll to sections
