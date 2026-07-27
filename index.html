@@ -3325,66 +3325,95 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
 /* Static grid stage */
 /* Stage: 3 columns, middle column centered horizontally and offset vertically
    so it interleaves between the outer columns — matches the screenshot. */
+/* Radial orbit stage — scattered bubbles around a central hub */
 .svc3d-stage {
-  --card: 128px;              /* circle diameter (mobile) */
-  --arc-h: 46px;              /* space reserved for curved label above circle */
-  --row-gap: 18px;
-  --col-gap: 6px;
-  width: 100%;
-  max-width: 520px;
+  --hub: 150px;          /* central Venue Booking circle */
+  --orbit-r: 150px;      /* base orbit radius for surrounding bubbles */
+  --bubble: 96px;        /* surrounding service bubble diameter */
+  --arc-h: 40px;
+  position: relative;
+  width: min(520px, 100%);
+  height: 560px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  align-items: start;
-  justify-items: center;
-  padding: 10px 4px;
 }
-.svc3d-col {
+.svc3d-stage-inner {
+  position: absolute;
+  inset: 0;
+}
+.svc3d-hub {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--hub);
+  height: var(--hub);
+  border-radius: 50%;
+  background: var(--gradient-accent);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--row-gap);
-  width: 100%;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1.15;
+  padding: 0 1rem;
+  border: 4px solid #0a0a0a;
+  box-shadow: 0 0 0 3px rgba(241,130,74,.9), 0 0 40px rgba(241,130,74,.5);
+  z-index: 5;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(.3);
+  transition: opacity .5s ease, transform .6s cubic-bezier(.34,1.56,.64,1);
 }
-.svc3d-col--mid {
-  /* Push middle column down so its circles sit between the outer rows */
-  transform: translateY(calc((var(--card) + var(--arc-h) + var(--row-gap)) / 2));
+.svc3d-overlay.open .svc3d-hub {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+.svc3d-overlay.closing .svc3d-hub {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(.3);
 }
 
-/* Each card = curved label (SVG arc) + circular image */
+/* Each bubble is absolutely placed by inline top/left from JS.
+   --x / --y are percentages of the stage. */
 .svc3d-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  text-decoration: none;
-  color: #fff;
-  width: var(--card);
+  position: absolute;
+  width: var(--bubble);
+  /* center the bubble on its coordinate, nudged up by arc height */
+  transform: translate(calc(var(--x) - 50%), calc(var(--y) - 50% - var(--arc-h)/2));
   opacity: 0;
-  transform: scale(.35) translateY(14px);
-  transition:
-    transform .55s cubic-bezier(.34,1.56,.64,1),
-    opacity .4s ease;
-  cursor: pointer;
+  transition: opacity .45s ease, transform .6s cubic-bezier(.34,1.56,.64,1);
 }
 .svc3d-overlay.open .svc3d-card {
   opacity: 1;
-  transform: scale(1) translateY(0);
+  transform: translate(calc(var(--x) - 50%), calc(var(--y) - 50% - var(--arc-h)/2));
 }
 .svc3d-overlay.closing .svc3d-card {
   opacity: 0;
-  transform: scale(.25) translateY(8px);
-  transition:
-    transform .35s cubic-bezier(.55,-0.05,.5,.05),
-    opacity .3s ease;
+  transform: translate(calc(var(--x) - 50%), calc(var(--y) - 50%)) scale(.4);
+  transition: opacity .3s ease, transform .35s ease;
 }
 
-/* Curved label sits above the circle, following its top arc */
+.svc3d-card-img {
+  width: var(--bubble);
+  height: var(--bubble);
+  border-radius: 50%;
+  background: #1a1a1a center/cover no-repeat;
+  border: 3px solid rgba(255,255,255,.85);
+  box-shadow: 0 8px 22px rgba(0,0,0,.6);
+  transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+}
+.svc3d-card:hover .svc3d-card-img,
+.svc3d-card.is-active .svc3d-card-img {
+  transform: scale(1.08);
+  border-color: var(--accent);
+  box-shadow: 0 12px 30px rgba(241,130,74,.5), 0 0 0 2px var(--accent);
+}
+
 .svc3d-arc {
-  width: calc(var(--card) + 40px);
+  width: calc(var(--bubble) + 36px);
   height: var(--arc-h);
-  margin-bottom: -6px;       /* nestle label against top of circle */
+  margin-bottom: -6px;
   overflow: visible;
   pointer-events: none;
   display: block;
@@ -3392,60 +3421,26 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
 .svc3d-arc text {
   font-family: 'Playfair Display', serif;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 13px;
   fill: #fff;
-  letter-spacing: .3px;
   paint-order: stroke;
   stroke: rgba(0,0,0,.85);
   stroke-width: 3px;
   stroke-linejoin: round;
 }
 
-.svc3d-card-img {
-  width: var(--card);
-  height: var(--card);
-  border-radius: 50%;
-  background: #1a1a1a center/cover no-repeat;
-  border: 3px solid #0a0a0a;
-  box-shadow:
-    0 10px 24px rgba(0,0,0,.6),
-    0 0 0 2px rgba(255,255,255,.04);
-  transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
-}
-.svc3d-card:hover .svc3d-card-img,
-.svc3d-card:focus-visible .svc3d-card-img,
-.svc3d-card.is-active .svc3d-card-img {
-  transform: scale(1.07);
-  border-color: var(--accent);
-  box-shadow:
-    0 16px 38px rgba(241,130,74,.45),
-    0 0 0 3px rgba(241,130,74,.95),
-    0 0 28px rgba(241,130,74,.4);
-}
-.svc3d-card:hover .svc3d-arc text,
-.svc3d-card.is-active .svc3d-arc text {
-  fill: var(--accent);
-}
-.svc3d-card:focus { outline: none; }
-
-/* Small phones */
-@media (max-width: 400px) {
-  .svc3d-stage { --card: 108px; --arc-h: 42px; --row-gap: 14px; }
-  .svc3d-arc text { font-size: 13px; }
-}
-@media (max-width: 340px) {
-  .svc3d-stage { --card: 94px; --arc-h: 38px; --row-gap: 12px; }
-  .svc3d-arc text { font-size: 12px; }
-}
-
-/* Tablet & desktop — same interleaved 3-column layout, bigger circles */
+/* Responsive scaling */
 @media (min-width: 601px) {
-  .svc3d-stage { --card: 160px; --arc-h: 54px; --row-gap: 22px; max-width: 640px; }
-  .svc3d-arc text { font-size: 17px; }
+  .svc3d-stage { --hub: 180px; --orbit-r: 175px; --bubble: 120px; --arc-h: 48px; height: 640px; }
+  .svc3d-arc text { font-size: 15px; }
 }
 @media (min-width: 900px) {
-  .svc3d-stage { --card: 180px; --arc-h: 58px; --row-gap: 26px; max-width: 720px; }
-  .svc3d-arc text { font-size: 18px; }
+  .svc3d-stage { --hub: 200px; --orbit-r: 195px; --bubble: 132px; --arc-h: 52px; height: 700px; max-width: 760px; }
+  .svc3d-arc text { font-size: 16px; }
+}
+@media (max-width: 400px) {
+  .svc3d-stage { --hub: 120px; --orbit-r: 120px; --bubble: 78px; --arc-h: 34px; height: 480px; }
+  .svc3d-arc text { font-size: 11px; }
 }
 
 /* Show bottom nav & hide old mobile menu on small screens */
@@ -5796,7 +5791,7 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
 
       function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-      function cardHTML(label, i, delay){
+      function cardHTML(label, i, delay, x, y){
         const src = labelToSource[label] || label;
         const list = (typeof servicesData !== 'undefined' ? servicesData : []);
         const svc = list.find(s => s.name === src) || {};
@@ -5810,32 +5805,53 @@ body.preloading .hero-bg.active { opacity: 0 !important; }
           +     esc(label)
           +   '</textPath></text>'
           + '</svg>';
-        return '<a href="' + href + '" class="svc3d-card" data-label="' + esc(label) + '" style="transition-delay:' + delay + 'ms">'
-             +   arc
-             +   '<div class="svc3d-card-img" style="background-image:url(\'' + img + '\')"></div>'
-             + '</a>';
+        return '<a href__="' + href + '" class="svc3d-card" data-label="' + esc(label) + '" '
+       + 'style="--x:' + x + '%; --y:' + y + '%; transition-delay:' + delay + 'ms">'
+       +   arc
+       +   '<div class="svc3d-card-img" style="background-image:url(\'' + img + '\')"></div>'
+       + '</a>';
       }
 
       function buildStage(){
-        if (built) return;
-        const cols = ['left','mid','right'];
-        const colHTML = {};
-        let i = 0;
-        cols.forEach(col => {
-          colHTML[col] = displayOrder[col].map((label, rowIdx) => {
-            const delay = rowIdx * 70 + (col === 'mid' ? 0 : 40);
-            const html = cardHTML(label, i, delay);
-            i++;
-            return html;
-          }).join('');
-        });
-        stage.innerHTML =
-            '<div class="svc3d-col svc3d-col--left">'  + colHTML.left  + '</div>'
-          + '<div class="svc3d-col svc3d-col--mid">'   + colHTML.mid   + '</div>'
-          + '<div class="svc3d-col svc3d-col--right">' + colHTML.right + '</div>';
-        built = true;
-      }
+  if (built) return;
 
+  // Central hub
+  let hubHTML = '<a href__="/service/venue-booking" class="svc3d-hub" data-label="Venue Booking">Venue<br>Booking</a>';
+
+  // Surrounding services — (x, y) are % positions on the stage,
+  // hand-tuned to reproduce the scattered radial orbit in the reference.
+  const positions = [
+    { x: 50, y: 8  }, // Drone Coverage  — top center
+    { x: 78, y: 14 }, // Bridal Jewelry — top right
+    { x: 92, y: 40 }, // Car Renting    — mid right
+    { x: 84, y: 66 }, // Henna Artists  — lower right
+    { x: 70, y: 88 }, // Photography    — bottom right
+    { x: 30, y: 88 }, // Catering       — bottom left
+    { x: 8,  y: 66 }, // Bridal Wear    — lower left
+    { x: 14, y: 40 }, // Moviemaking     — mid left
+    { x: 22, y: 14 }, // Wedding Album   — top left
+    { x: 50, y: 30 }, // Bridal Makeup   — just above hub
+    { x: 50, y: 70 }, // Decor Service   — just below hub
+  ];
+  const labels = [
+    'Drone Coverage','Bridal Jewelry','Car Renting','Henna Artists',
+    'Photography','Catering Service','Bridal Wear','Moviemaking',
+    'Wedding Album','Bridal Makeup','Decor Service'
+  ];
+
+  let cardsHTML = '';
+  labels.forEach((label, i) => {
+    const p = positions[i];
+    cardsHTML += cardHTML(label, i, i * 60, p.x, p.y);
+  });
+
+  stage.innerHTML =
+      '<div class="svc3d-stage-inner">'
+    +   hubHTML
+    +   cardsHTML
+    + '</div>';
+  built = true;
+}
 
       function openOverlay(){
         buildStage();
